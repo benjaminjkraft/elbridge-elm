@@ -1,8 +1,11 @@
 module Precinct (Model, initSquare, Action, update, view) where
 
+import Debug exposing (crash)
 import Maybe exposing (Maybe(Just, Nothing))
+import Signal
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
+import Svg.Events exposing (..)
 
 
 type alias Model = {
@@ -28,11 +31,27 @@ update : Action -> Model -> Model
 update district precinct = {precinct | district = district}
 
 
-view : Model -> Svg
-view precinct = rect [
+view : Signal.Address Action -> Model -> Svg
+view address precinct = rect [
     stroke "black",
-    fill "none", -- TODO
+    fill (precinctColor precinct.district),
+    onClick (Signal.message address (nextColor precinct.district)),
     x (toString precinct.x),
     y (toString precinct.y),
     width (toString precinct.width),
     height (toString precinct.height)] []
+
+nextColor : Maybe Int -> Maybe Int
+nextColor district = case district of
+    Nothing -> Just 1
+    Just x -> if x < 5 then Just (x + 1) else Nothing -- TODO
+
+precinctColor : Maybe Int -> String
+precinctColor district = case district of
+    Nothing -> "white"
+    Just 1 -> "red"
+    Just 2 -> "blue"
+    Just 3 -> "green"
+    Just 4 -> "yellow"
+    Just 5 -> "purple"
+    Just _ -> crash "unsupported district ID" -- TODO
