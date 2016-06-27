@@ -1,8 +1,9 @@
 import Html
-import List exposing (map, concatMap)
+import Html.Attributes
+import List exposing (map, concatMap, filter, length)
 import Html.App
-import Svg exposing (..)
-import Svg.Attributes exposing (..)
+import Svg
+import Svg.Attributes
 
 import Precinct
 
@@ -46,5 +47,11 @@ update action model = case action of
 
 view : Model -> Html.Html Msg
 view model =
-    svg [width "400", height "600"]
-        (map (\(id, p) -> Html.App.map (Modify id) (Precinct.view p)) model.precincts)
+    Html.div [] [
+        Html.div [Html.Attributes.class "map-container"] [
+            Svg.svg [Svg.Attributes.width "400", Svg.Attributes.height "600"]
+                (map (\(id, p) -> Html.App.map (Modify id) (Precinct.view p)) model.precincts)],
+        Html.div [Html.Attributes.class "data-container"]
+            (map (\d -> Html.span [Html.Attributes.class "data-line"]
+                                  [Html.text ("District " ++ toString d ++ ": " ++ toString (length (filter (\(id, p) -> p.district == Just d) model.precincts)))])
+                 [1..5])]
