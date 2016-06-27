@@ -1,14 +1,16 @@
-import Html exposing (Html)
+import Html
 import List exposing (map, concatMap)
-import Signal
-import StartApp.Simple exposing (start)
+import Html.App
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 
 import Precinct
 
-main : Signal Html
-main = start { model = blankMap, update = update, view = view }
+main : Program Never
+main = Html.App.beginnerProgram {
+    model = blankMap,
+    update = update,
+    view = view}
 
 type alias District = {
     id: Int}
@@ -19,8 +21,8 @@ type alias Model = {
     precincts : List (Int, Precinct.Model)}
     
 
-type Action = Reset
-    | Modify Int Precinct.Action
+type Msg = Reset
+    | Modify Int Precinct.Msg
 
 
 blankMap : Model
@@ -31,19 +33,18 @@ blankMap = {
          Precinct.initSquare x y)) [0..5]) [0..3]}
 
 
-update : Action -> Model -> Model
+update : Msg -> Model -> Model
 update action model = case action of
     Reset -> blankMap
-    Modify id precinctAction ->
+    Modify id precinctMsg ->
         let updatePrecinct (precinctID, precinctModel) = -- TODO: generalize
             if precinctID == id
-               then (precinctID, Precinct.update precinctAction precinctModel)
+               then (precinctID, Precinct.update precinctMsg precinctModel)
                else (precinctID, precinctModel)
         in { model | precincts = List.map updatePrecinct model.precincts }
 
 
-view : Signal.Address Action -> Model -> Html
-view address model =
+view : Model -> Html.Html Msg
+view model =
     svg [width "400", height "600"]
-        (map (\(id, p) -> Precinct.view
-            (Signal.forwardTo address (Modify id)) p) model.precincts)
+        (map (\(id, p) -> Html.App.map (Modify id) (Precinct.view p)) model.precincts)

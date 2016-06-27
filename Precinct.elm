@@ -1,8 +1,7 @@
-module Precinct (Model, initSquare, Action, update, view) where
+module Precinct exposing (Model, initSquare, Msg, update, view)
 
 import Debug exposing (crash)
 import Maybe exposing (Maybe(Just, Nothing))
-import Signal
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Svg.Events exposing (..)
@@ -24,18 +23,18 @@ initSquare x y = {
     pop = 1, district = Nothing}
 
 
-type alias Action = Maybe Int -- district ID to switch to
+type alias Msg = Maybe Int -- district ID to switch to
 
 
-update : Action -> Model -> Model
+update : Msg -> Model -> Model
 update district precinct = {precinct | district = district}
 
 
-view : Signal.Address Action -> Model -> Svg
-view address precinct = rect [
+view : Model -> Svg Msg
+view precinct = rect [
     stroke "black",
     fill (precinctColor precinct.district),
-    onClick (Signal.message address (nextColor precinct.district)),
+    onClick (nextColor precinct.district),
     x (toString precinct.x),
     y (toString precinct.y),
     width (toString precinct.width),
