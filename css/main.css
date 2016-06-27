@@ -1,0 +1,7 @@
+.map-container, .data-container {
+    display: inline-block;
+}
+
+.data-line {
+    display: block;
+}

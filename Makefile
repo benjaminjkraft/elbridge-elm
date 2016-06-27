@@ -1,7 +1,7 @@
 
-index.html: elm-package.json *.elm
+build/elm.js: elm-package.json src/*.elm
 	# TODO: make it as JS, embed in index.html.
-	elm make Main.elm --output index.html --warn
+	elm make src/Main.elm --output build/elm.js --warn
 
 clean:
-	rm index.html elm.js
+	rm build/elm.js
